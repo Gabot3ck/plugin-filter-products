@@ -3,7 +3,7 @@
 function fcw_get_current_category() {
     if (is_tax('product_cat')) {
         $term = get_queried_object();
-        return $term ? $term->term_id : 0;
+        return $term; // Devolver el objeto completo de la categoría
     }
-    return 0;
+    return null; // Devolver null si no estamos en una categoría
 }

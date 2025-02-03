@@ -18,17 +18,29 @@ require_once plugin_dir_path(__FILE__) . 'includes/filter_categories.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_colors.php';
 
 // Registrar el shortcode
-function fcw_shortcode_filtro_categorias() {
-    $current_category_id = fcw_get_current_category();
+function fcw_shortcode_filter_categories() {
+    $current_category = fcw_get_current_category();
     
-    if ($current_category_id == 0) {
+    if (!$current_category) {
         return ''; // No mostrar el filtro si no estamos en una categoría
+    }
+
+    // Obtener la URL de la categoría padre
+    $parent_category_url = '';
+    if ($current_category->parent) {
+        $parent_category = get_term($current_category->parent, 'product_cat');
+        if ($parent_category && !is_wp_error($parent_category)) {
+            $parent_category_url = get_term_link($parent_category);
+        }
+    } else {
+        // Si no hay categoría padre, usar la URL de la categoría actual
+        $parent_category_url = get_term_link($current_category);
     }
 
     $output = '<div class="accordion" id="fcwAccordion">';
     
     // Acordeón para categorías
-    $menu_categories = fcw_create_menu_categories($current_category_id);
+    $menu_categories = fcw_create_menu_categories($current_category->term_id);
     if (!empty($menu_categories)) {
         $output .= '<div class="accordion-item">';
         $output .= '<h2 class="accordion-header" id="fcwHeadingCat">';
@@ -45,7 +57,7 @@ function fcw_shortcode_filtro_categorias() {
     }
     
     // Acordeón para colores
-    $menu_colores = fcw_create_menu_colors($current_category_id);
+    $menu_colores = fcw_create_menu_colors($current_category->term_id);
     if (!empty($menu_colores)) {
         $output .= '<div class="accordion-item">';
         $output .= '<h2 class="accordion-header" id="fcwHeadingColor">';
@@ -62,13 +74,12 @@ function fcw_shortcode_filtro_categorias() {
     }
     
     // Botón para limpiar filtros
-    $category_url = get_term_link($current_category_id, 'product_cat');
     $output .= '<div class="mt-3">';
-    $output .= '<a href="' . esc_url($category_url) . '" class="btn btn-danger w-100">Borrar Filtros</a>';
+    $output .= '<a href="' . esc_url($parent_category_url) . '" class="btn btn-danger w-100">Borrar Filtros</a>';
     $output .= '</div>';
     
     $output .= '</div>';
 
     return $output;
 }
-add_shortcode('filtro_categorias', 'fcw_shortcode_filtro_categorias');
+add_shortcode('filtro_categorias', 'fcw_shortcode_filter_categories');
