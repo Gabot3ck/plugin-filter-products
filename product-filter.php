@@ -8,7 +8,7 @@
  */
 
 // Asegurarse de que WordPress está cargado
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
@@ -21,30 +21,24 @@ function fcw_obtener_categoria_actual() {
     return 0;
 }
 
-// Función para obtener las categorías hermanas e hijas
+// Función para obtener las categorías hijas de la categoría actual
 function fcw_generar_menu_categorias($categoria_id) {
-    $term = get_term($categoria_id, 'product_cat');
-    if (!$term) {
-        return '';
-    }
-
-    $parent_id = $term->parent ? $term->parent : $categoria_id;
     $categorias = get_terms(array(
         'taxonomy' => 'product_cat',
         'hide_empty' => true,
-        'parent' => $parent_id,
+        'parent' => $categoria_id, // Solo obtener categorías hijas
     ));
 
     if (empty($categorias)) {
         return ''; // No mostrar el menú si no hay subcategorías
     }
 
-    $output = '<ul class="dropdown-menu">';
+    $output = '<div class="list-group">';
     foreach ($categorias as $categoria) {
         $url_categoria = get_term_link($categoria);
-        $output .= '<li><a class="dropdown-item" href="' . esc_url($url_categoria) . '">' . esc_html($categoria->name) . '</a></li>';
+        $output .= '<a href="' . esc_url($url_categoria) . '" class="list-group-item list-group-item-action">' . esc_html($categoria->name) . '</a>';
     }
-    $output .= '</ul>';
+    $output .= '</div>';
 
     return $output;
 }
@@ -81,11 +75,11 @@ function fcw_obtener_colores_disponibles($categoria_id) {
         return ''; // No mostrar filtro si no hay colores disponibles
     }
 
-    $output = '<ul class="dropdown-menu">';
+    $output = '<div class="list-group">';
     foreach ($colores as $color_slug => $color_nombre) {
-        $output .= '<li><a class="dropdown-item" href="?filter_color=' . esc_attr($color_slug) . '">' . esc_html($color_nombre) . '</a></li>';
+        $output .= '<a href="?filter_color=' . esc_attr($color_slug) . '" class="list-group-item list-group-item-action">' . esc_html($color_nombre) . '</a>';
     }
-    $output .= '</ul>';
+    $output .= '</div>';
 
     return $output;
 }
@@ -107,19 +101,43 @@ function fcw_shortcode_filtro_categorias() {
 
     $categoria_url = get_term_link($categoria_actual_id, 'product_cat');
     
-    $output = '<div class="dropdown">';
+    $output = '<div class="accordion" id="fcwAccordion">';
+    
+    // Acordeón para categorías
     if (!empty($menu_categorias)) {
-        $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdownCat" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
+        $output .= '<div class="accordion-item">';
+        $output .= '<h2 class="accordion-header" id="fcwHeadingCat">';
+        $output .= '<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseCat" aria-expanded="true" aria-controls="fcwCollapseCat">';
+        $output .= 'Filtrar por Categoría';
+        $output .= '</button>';
+        $output .= '</h2>';
+        $output .= '<div id="fcwCollapseCat" class="accordion-collapse collapse show" aria-labelledby="fcwHeadingCat" data-bs-parent="#fcwAccordion">';
+        $output .= '<div class="accordion-body">';
         $output .= $menu_categorias;
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
     }
+    
+    // Acordeón para colores
     if (!empty($menu_colores)) {
-        $output .= '<button class="btn btn-secondary dropdown-toggle" type="button" id="fcwDropdownColor" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Color</button>';
+        $output .= '<div class="accordion-item">';
+        $output .= '<h2 class="accordion-header" id="fcwHeadingColor">';
+        $output .= '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseColor" aria-expanded="false" aria-controls="fcwCollapseColor">';
+        $output .= 'Filtrar por Color';
+        $output .= '</button>';
+        $output .= '</h2>';
+        $output .= '<div id="fcwCollapseColor" class="accordion-collapse collapse" aria-labelledby="fcwHeadingColor" data-bs-parent="#fcwAccordion">';
+        $output .= '<div class="accordion-body">';
         $output .= $menu_colores;
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
     }
     
     // Botón para limpiar filtros
-    $output .= '<div class="mt-2">';
-    $output .= '<a href="' . esc_url($categoria_url) . '" class="btn btn-danger">Borrar Filtros</a>';
+    $output .= '<div class="mt-3">';
+    $output .= '<a href="' . esc_url($categoria_url) . '" class="btn btn-danger w-100">Borrar Filtros</a>';
     $output .= '</div>';
     
     $output .= '</div>';
