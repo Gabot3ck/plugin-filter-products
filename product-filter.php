@@ -21,7 +21,7 @@ function fcw_obtener_categoria_actual() {
     return 0;
 }
 
-// Función para obtener las categorías hijas de la categoría actual
+// Función para obtener las categorías hijas de la categoría actual y contar productos
 function fcw_generar_menu_categorias($categoria_id) {
     $categorias = get_terms(array(
         'taxonomy' => 'product_cat',
@@ -36,14 +36,18 @@ function fcw_generar_menu_categorias($categoria_id) {
     $output = '<div class="list-group">';
     foreach ($categorias as $categoria) {
         $url_categoria = get_term_link($categoria);
-        $output .= '<a href="' . esc_url($url_categoria) . '" class="list-group-item list-group-item-action">' . esc_html($categoria->name) . '</a>';
+        $cantidad_productos = $categoria->count; // Obtener la cantidad de productos en la categoría
+        $output .= '<a href="' . esc_url($url_categoria) . '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">';
+        $output .= esc_html($categoria->name);
+        $output .= '<span class="badge bg-primary rounded-pill">' . esc_html($cantidad_productos) . '</span>';
+        $output .= '</a>';
     }
     $output .= '</div>';
 
     return $output;
 }
 
-// Función para obtener los colores disponibles en la categoría actual
+// Función para obtener los colores disponibles en la categoría actual y contar productos
 function fcw_obtener_colores_disponibles($categoria_id) {
     $args = array(
         'post_type' => 'product',
@@ -65,7 +69,13 @@ function fcw_obtener_colores_disponibles($categoria_id) {
             $producto_id = get_the_ID();
             $producto_colores = wp_get_post_terms($producto_id, 'pa_color');
             foreach ($producto_colores as $color) {
-                $colores[$color->slug] = $color->name;
+                if (!isset($colores[$color->slug])) {
+                    $colores[$color->slug] = array(
+                        'name' => $color->name,
+                        'count' => 0,
+                    );
+                }
+                $colores[$color->slug]['count']++;
             }
         }
         wp_reset_postdata();
@@ -76,8 +86,11 @@ function fcw_obtener_colores_disponibles($categoria_id) {
     }
 
     $output = '<div class="list-group">';
-    foreach ($colores as $color_slug => $color_nombre) {
-        $output .= '<a href="?filter_color=' . esc_attr($color_slug) . '" class="list-group-item list-group-item-action">' . esc_html($color_nombre) . '</a>';
+    foreach ($colores as $color_slug => $color_data) {
+        $output .= '<a href="?filter_color=' . esc_attr($color_slug) . '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">';
+        $output .= esc_html($color_data['name']);
+        $output .= '<span class="badge bg-primary rounded-pill">' . esc_html($color_data['count']) . '</span>';
+        $output .= '</a>';
     }
     $output .= '</div>';
 
