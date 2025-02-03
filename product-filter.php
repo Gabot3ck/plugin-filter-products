@@ -12,46 +12,50 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
+// Función para obtener la categoría actual
+function fcw_obtener_categoria_actual() {
+    if (is_tax('product_cat')) {
+        $term = get_queried_object();
+        return $term ? $term->term_id : 0;
+    }
+    return 0;
+}
+
+// Función para mostrar solo las subcategorías de la categoría actual
+function fcw_generar_menu_categorias($parent_id) {
+    $categorias = get_terms(array(
+        'taxonomy' => 'product_cat',
+        'hide_empty' => true,
+        'parent' => $parent_id,
+    ));
+
+    if (empty($categorias)) {
+        return '';
+    }
+
+    $output = '<ul class="dropdown-menu">';
+    foreach ($categorias as $categoria) {
+        $url_categoria = get_term_link($categoria);
+        $output .= '<li><a class="dropdown-item" href="' . esc_url($url_categoria) . '">' . esc_html($categoria->name) . '</a></li>';
+    }
+    $output .= '</ul>';
+
+    return $output;
+}
+
 // Registrar el shortcode
 function fcw_shortcode_filtro_categorias() {
-  // Obtener todas las categorías de productos
-  $categorias = get_terms(array(
-      'taxonomy' => 'product_cat',
-      'hide_empty' => true,
-  ));
+    $categoria_actual_id = fcw_obtener_categoria_actual();
+    
+    if ($categoria_actual_id == 0) {
+        return ''; // No mostrar el filtro si no estamos en una categoría
+    }
 
-  // Si no hay categorías, salir
-  if (empty($categorias)) {
-      return 'No se encontraron categorías.';
-  }
+    $output = '<div class="dropdown">';
+    $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
+    $output .= fcw_generar_menu_categorias($categoria_actual_id);
+    $output .= '</div>';
 
-  // Generar el formulario de filtro
-  $output = '<form id="fcw-filtro-categorias" action="" method="get">';
-  $output .= '<select name="fcw_categoria" id="fcw-categoria">';
-  $output .= '<option value="">Selecciona una categoría</option>';
-
-  foreach ($categorias as $categoria) {
-      $url_categoria = get_term_link($categoria);
-      $output .= '<option value="' . esc_url($url_categoria) . '">' . esc_html($categoria->name) . '</option>';
-  }
-
-  $output .= '</select>';
-  $output .= '<button type="submit">Filtrar</button>';
-  $output .= '</form>';
-
-  // Script para redireccionar al seleccionar una categoría
-  $output .= '<script>
-      document.getElementById("fcw-categoria").addEventListener("change", function() {
-          if (this.value) {
-              window.location.href = this.value;
-          }
-      });
-  </script>';
-
-  return $output;
+    return $output;
 }
 add_shortcode('filtro_categorias', 'fcw_shortcode_filtro_categorias');
-
-
-
-
