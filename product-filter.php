@@ -105,6 +105,8 @@ function fcw_shortcode_filtro_categorias() {
         return ''; // Ocultar completamente si no hay filtros disponibles
     }
 
+    $categoria_url = get_term_link($categoria_actual_id, 'product_cat');
+    
     $output = '<div class="dropdown">';
     if (!empty($menu_categorias)) {
         $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdownCat" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
@@ -114,6 +116,12 @@ function fcw_shortcode_filtro_categorias() {
         $output .= '<button class="btn btn-secondary dropdown-toggle" type="button" id="fcwDropdownColor" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Color</button>';
         $output .= $menu_colores;
     }
+    
+    // Botón para limpiar filtros
+    $output .= '<div class="mt-2">';
+    $output .= '<a href="' . esc_url($categoria_url) . '" class="btn btn-danger">Borrar Filtros</a>';
+    $output .= '</div>';
+    
     $output .= '</div>';
 
     return $output;
