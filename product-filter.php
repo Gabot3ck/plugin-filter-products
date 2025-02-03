@@ -36,7 +36,7 @@ function fcw_generar_menu_categorias($categoria_id) {
     ));
 
     if (empty($categorias)) {
-        return '';
+        return ''; // No mostrar el menú si no hay subcategorías
     }
 
     $output = '<ul class="dropdown-menu">';
@@ -57,9 +57,14 @@ function fcw_shortcode_filtro_categorias() {
         return ''; // No mostrar el filtro si no estamos en una categoría
     }
 
+    $menu_categorias = fcw_generar_menu_categorias($categoria_actual_id);
+    if (empty($menu_categorias)) {
+        return ''; // Ocultar completamente si no hay subcategorías
+    }
+
     $output = '<div class="dropdown">';
     $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
-    $output .= fcw_generar_menu_categorias($categoria_actual_id);
+    $output .= $menu_categorias;
     $output .= '</div>';
 
     return $output;
