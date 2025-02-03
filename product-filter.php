@@ -49,6 +49,47 @@ function fcw_generar_menu_categorias($categoria_id) {
     return $output;
 }
 
+// Función para obtener los colores disponibles en la categoría actual
+function fcw_obtener_colores_disponibles($categoria_id) {
+    $args = array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field' => 'id',
+                'terms' => $categoria_id,
+            ),
+        ),
+    );
+    $query = new WP_Query($args);
+    $colores = array();
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $producto_id = get_the_ID();
+            $producto_colores = wp_get_post_terms($producto_id, 'pa_color');
+            foreach ($producto_colores as $color) {
+                $colores[$color->slug] = $color->name;
+            }
+        }
+        wp_reset_postdata();
+    }
+
+    if (empty($colores)) {
+        return ''; // No mostrar filtro si no hay colores disponibles
+    }
+
+    $output = '<ul class="dropdown-menu">';
+    foreach ($colores as $color_slug => $color_nombre) {
+        $output .= '<li><a class="dropdown-item" href="?filter_color=' . esc_attr($color_slug) . '">' . esc_html($color_nombre) . '</a></li>';
+    }
+    $output .= '</ul>';
+
+    return $output;
+}
+
 // Registrar el shortcode
 function fcw_shortcode_filtro_categorias() {
     $categoria_actual_id = fcw_obtener_categoria_actual();
@@ -58,13 +99,21 @@ function fcw_shortcode_filtro_categorias() {
     }
 
     $menu_categorias = fcw_generar_menu_categorias($categoria_actual_id);
-    if (empty($menu_categorias)) {
-        return ''; // Ocultar completamente si no hay subcategorías
+    $menu_colores = fcw_obtener_colores_disponibles($categoria_actual_id);
+    
+    if (empty($menu_categorias) && empty($menu_colores)) {
+        return ''; // Ocultar completamente si no hay filtros disponibles
     }
 
     $output = '<div class="dropdown">';
-    $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdown" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
-    $output .= $menu_categorias;
+    if (!empty($menu_categorias)) {
+        $output .= '<button class="btn btn-primary dropdown-toggle" type="button" id="fcwDropdownCat" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Categoría</button>';
+        $output .= $menu_categorias;
+    }
+    if (!empty($menu_colores)) {
+        $output .= '<button class="btn btn-secondary dropdown-toggle" type="button" id="fcwDropdownColor" data-bs-toggle="dropdown" aria-expanded="false">Filtrar por Color</button>';
+        $output .= $menu_colores;
+    }
     $output .= '</div>';
 
     return $output;
