@@ -21,8 +21,14 @@ function fcw_obtener_categoria_actual() {
     return 0;
 }
 
-// Función para mostrar solo las subcategorías de la categoría actual
-function fcw_generar_menu_categorias($parent_id) {
+// Función para obtener las categorías hermanas e hijas
+function fcw_generar_menu_categorias($categoria_id) {
+    $term = get_term($categoria_id, 'product_cat');
+    if (!$term) {
+        return '';
+    }
+
+    $parent_id = $term->parent ? $term->parent : $categoria_id;
     $categorias = get_terms(array(
         'taxonomy' => 'product_cat',
         'hide_empty' => true,
