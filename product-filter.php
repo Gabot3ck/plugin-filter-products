@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 require_once plugin_dir_path(__FILE__) . 'includes/helpers.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_categories.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_colors.php';
+require_once plugin_dir_path(__FILE__) . 'includes/filter_sizes.php';
 
 // Registrar el shortcode
 function fcw_shortcode_filter_categories() {
@@ -58,6 +59,23 @@ function fcw_shortcode_filter_categories() {
         $output .= '<div id="fcwCollapseColor" class="accordion-collapse collapse" aria-labelledby="fcwHeadingColor" data-bs-parent="#fcwAccordion">';
         $output .= '<div class="accordion-body">';
         $output .= $menu_colores;
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+    }
+
+    // Acordeón para medidas
+    $menu_sizes = fcw_create_menu_sizes($current_category->term_id);
+    if (!empty($menu_sizes)) {
+        $output .= '<div class="accordion-item">';
+        $output .= '<h2 class="accordion-header" id="fcwHeadingSize">';
+        $output .= '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseSize" aria-expanded="false" aria-controls="fcwCollapseSize">';
+        $output .= esc_html__('Filtrar por Medida', 'fcw'); // Texto traducible
+        $output .= '</button>';
+        $output .= '</h2>';
+        $output .= '<div id="fcwCollapseSize" class="accordion-collapse collapse" aria-labelledby="fcwHeadingSize" data-bs-parent="#fcwAccordion">';
+        $output .= '<div class="accordion-body">';
+        $output .= $menu_sizes;
         $output .= '</div>';
         $output .= '</div>';
         $output .= '</div>';
