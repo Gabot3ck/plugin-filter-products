@@ -72,13 +72,6 @@ function fcw_shortcode_filter_categories() {
         $output .= '</div>';
         $output .= '</div>';
     }
-    
-    // Botón para limpiar filtros
-    $output .= '<div class="mt-3">';
-    $output .= '<a href="' . esc_url($parent_category_url) . '" class="btn btn-danger w-100">Borrar Filtros</a>';
-    $output .= '</div>';
-    
-    $output .= '</div>';
 
     return $output;
 }
