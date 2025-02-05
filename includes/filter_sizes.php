@@ -48,7 +48,7 @@ function fcw_create_menu_sizes($category_id) {
     foreach ($sizes as $size_slug => $size_data) {
         $output .= '<a href="?filter_medida=' . esc_attr($size_slug) . '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">';
         $output .= esc_html($size_data['name']);
-        $output .= '<span class="badge bg-primary rounded-pill">' . esc_html($size_data['count']) . '</span>';
+        $output .= '<span class="badge rounded-pill">' . esc_html($size_data['count']) . '</span>';
         $output .= '</a>';
     }
     $output .= '</div>';

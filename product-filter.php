@@ -17,6 +17,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/helpers.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_categories.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_colors.php';
 require_once plugin_dir_path(__FILE__) . 'includes/filter_sizes.php';
+require_once plugin_dir_path(__FILE__) . 'includes/filter_tag.php';
+
+
 
 // Registrar el shortcode
 function fcw_shortcode_filter_categories() {
@@ -27,8 +30,14 @@ function fcw_shortcode_filter_categories() {
         return '';
     }
 
+    // Cabecera del filtro
+    $output  = '<div class="header-filter-products">';
+    $output .= '<i class="bi bi-sliders"></i>';
+    $output .= '<h3>Filtros</h3>';
+    $output .= '</div>';
+
     // Generar el HTML del acordeón
-    $output = '<div class="accordion" id="fcwAccordion">';
+    $output .= '<div class="accordion" id="fcwAccordion">';
     
     // Acordeón para categorías
     $menu_categories = fcw_create_menu_categories($current_category->term_id);
@@ -36,7 +45,7 @@ function fcw_shortcode_filter_categories() {
         $output .= '<div class="accordion-item">';
         $output .= '<h2 class="accordion-header" id="fcwHeadingCat">';
         $output .= '<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseCat" aria-expanded="true" aria-controls="fcwCollapseCat">';
-        $output .= esc_html__('Filtrar por Categoría', 'fcw'); // Texto traducible
+        $output .= esc_html__('Categoría', 'fcw'); // Texto traducible
         $output .= '</button>';
         $output .= '</h2>';
         $output .= '<div id="fcwCollapseCat" class="accordion-collapse collapse show" aria-labelledby="fcwHeadingCat" data-bs-parent="#fcwAccordion">';
@@ -53,7 +62,7 @@ function fcw_shortcode_filter_categories() {
         $output .= '<div class="accordion-item">';
         $output .= '<h2 class="accordion-header" id="fcwHeadingColor">';
         $output .= '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseColor" aria-expanded="false" aria-controls="fcwCollapseColor">';
-        $output .= esc_html__('Filtrar por Color', 'fcw'); // Texto traducible
+        $output .= esc_html__('Color', 'fcw'); // Texto traducible
         $output .= '</button>';
         $output .= '</h2>';
         $output .= '<div id="fcwCollapseColor" class="accordion-collapse collapse" aria-labelledby="fcwHeadingColor" data-bs-parent="#fcwAccordion">';
@@ -70,12 +79,29 @@ function fcw_shortcode_filter_categories() {
         $output .= '<div class="accordion-item">';
         $output .= '<h2 class="accordion-header" id="fcwHeadingSize">';
         $output .= '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseSize" aria-expanded="false" aria-controls="fcwCollapseSize">';
-        $output .= esc_html__('Filtrar por Medida', 'fcw'); // Texto traducible
+        $output .= esc_html__('Medida', 'fcw'); // Texto traducible
         $output .= '</button>';
         $output .= '</h2>';
         $output .= '<div id="fcwCollapseSize" class="accordion-collapse collapse" aria-labelledby="fcwHeadingSize" data-bs-parent="#fcwAccordion">';
         $output .= '<div class="accordion-body">';
         $output .= $menu_sizes;
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+    }
+
+    // Acordeón para etiquetas (tags)
+    $menu_tags = fcw_create_menu_tags($current_category->term_id);
+    if (!empty($menu_tags)) {
+        $output .= '<div class="accordion-item">';
+        $output .= '<h2 class="accordion-header" id="fcwHeadingTag">';
+        $output .= '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fcwCollapseTag" aria-expanded="false" aria-controls="fcwCollapseTag">';
+        $output .= esc_html__('Uso', 'fcw'); // Texto traducible
+        $output .= '</button>';
+        $output .= '</h2>';
+        $output .= '<div id="fcwCollapseTag" class="accordion-collapse collapse" aria-labelledby="fcwHeadingTag" data-bs-parent="#fcwAccordion">';
+        $output .= '<div class="accordion-body">';
+        $output .= $menu_tags;
         $output .= '</div>';
         $output .= '</div>';
         $output .= '</div>';

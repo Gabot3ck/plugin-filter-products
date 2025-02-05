@@ -41,7 +41,7 @@ function fcw_create_menu_colors($categoria_id) {
     foreach ($colors as $color_slug => $color_data) {
         $output .= '<a href="?filter_color=' . esc_attr($color_slug) . '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">';
         $output .= esc_html($color_data['name']);
-        $output .= '<span class="badge bg-primary rounded-pill">' . esc_html($color_data['count']) . '</span>';
+        $output .= '<span class="badge rounded-pill">' . esc_html($color_data['count']) . '</span>';
         $output .= '</a>';
     }
     $output .= '</div>';

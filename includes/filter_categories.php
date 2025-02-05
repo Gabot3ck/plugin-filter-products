@@ -66,6 +66,6 @@ function fcw_generate_category_link($category) {
     $quantity_products = $category->count;
     return '<a href="' . esc_url($url_category) . '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">' .
         esc_html($category->name) .
-        '<span class="badge bg-primary rounded-pill">' . esc_html($quantity_products) . '</span>' .
+        '<span class="badge rounded-pill">' . esc_html($quantity_products) . '</span>' .
         '</a>';
 }
